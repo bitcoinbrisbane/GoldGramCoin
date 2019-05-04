@@ -3,7 +3,7 @@ pragma solidity 0.5.0;
 import "./IERC20.sol";
 import "./SafeMath.sol";
 
-contract GGCToken_Fix is IERC20 {
+contract GGCToken is IERC20 {
     using SafeMath for uint256;
 
     // Semi Standard ERC-20 Token Contract:
