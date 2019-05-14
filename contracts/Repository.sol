@@ -1,4 +1,4 @@
-pragma solidity 0.5.0;
+pragma solidity = 0.5.0;
 
 import "./SafeMath.sol";
 import "./IRepository.sol";
@@ -15,7 +15,7 @@ contract Repository is IRepository {
         uint256 total = 0;
 
         for (uint i = 0; i < _inventory.length; i++) {
-            total += _inventory[i].amount;
+            total = total.add(_inventory[i].amount);
         }
 
         return total;
