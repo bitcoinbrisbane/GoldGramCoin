@@ -62,12 +62,12 @@ The total balance of zero is set in a complicated way and unnecessary.  `totalSu
 
 ```
     it("Total supply should be 0", async function () {
-      const actual = await tokenInstance.totalSupply();
+      const actual = await contractInstance.totalSupply();
       assert.equal(actual.valueOf(), 0, "Total supply should be 0");
     });
 
     it("Owner balance should be 0", async function () {
-      const actual = await tokenInstance.balanceOf(OWNER);
+      const actual = await contractInstance.balanceOf(OWNER);
       assert.equal(actual.valueOf(), 0, "Balance should be 0");
     });
 ```
@@ -77,16 +77,16 @@ Fixed
 The operator (owner) could allow the user to buy more tokens than is in supply.
 ```
     it("Allows user to buy more than total supply", async function () {
-      let owner = await tokenInstance.accInfo(OWNER);
+      let owner = await contractInstance.accInfo(OWNER);
       assert.equal(0, Number(owner.balance), "Balance should be 0");
 
-      await tokenInstance.mint(100);
-      const totalSupply = await tokenInstance.totalSupply();
+      await contractInstance.mint(100);
+      const totalSupply = await contractInstance.totalSupply();
       assert.equal(100, Number(totalSupply), "Total supply should be 100");
 
-      await tokenInstance.buy(200, ALICE);
+      await contractInstance.buy(200, ALICE);
 
-      const alice = await tokenInstance.accInfo(200);
+      const alice = await contractInstance.accInfo(200);
       assert.equal(0, Number(alice.balance), "Balance should still be 0");
     });
 ```

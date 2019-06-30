@@ -1,4 +1,5 @@
 const Token = artifacts.require("GGCToken");
+const Repository = artifacts.require("Repository");
 const BigInt = require("big-integer");
 
 contract("GGCToken", function(accounts) {
@@ -9,7 +10,10 @@ contract("GGCToken", function(accounts) {
   let tokenInstance;
 
   beforeEach(async function () {
-    tokenInstance = await Token.new();
+    let repository = await Repository.new();
+    console.log(repository.address);
+
+    tokenInstance = await Token.new(repository.address);
   });
 
   describe("ERC20 tests", () => {
@@ -26,19 +30,9 @@ contract("GGCToken", function(accounts) {
       assert.equal(Number(actual), 0, "Total supply should be 0");
     });
 
-    it("owner balance should be 0", async function () {
-      const actual = await tokenInstance.accInfo(OWNER);
-      assert.equal(Number(actual.balance), 0, "Owner balance should be 0");
-    });
-
     it("should get balance of owner", async function () {
       const actual = await tokenInstance.balanceOf(OWNER);
       assert.equal(Number(actual), 0, "Owner balance should be 0");
-    });
-
-    it("owner should be verified", async function () {
-      const actual = await tokenInstance.accInfo(OWNER);
-      assert.equal(actual.isVerified, true, "Owner should be verified");
     });
   });
 
@@ -106,7 +100,7 @@ contract("GGCToken", function(accounts) {
   });
 
   describe("Transfer tests", () => {
-    it("It should be able to transfer tokens to verfied", async function () {
+    it("should be able to transfer tokens to verfied", async function () {
       await tokenInstance.verify(ALICE);
       let alice = await tokenInstance.accInfo(ALICE);
 
@@ -129,7 +123,7 @@ contract("GGCToken", function(accounts) {
       assert.equal(Number(ownerBalance), 50, "Balance should be 50");
     });
 
-    it.skip("It should not be able to transfer tokens to unverfied", async function () {
+    it.skip("should not be able to transfer tokens to unverfied", async function () {
       await tokenInstance.buy(100, OWNER, {from: OWNER });
       const totalSupply = await tokenInstance.totalSupply();
       assert.equal(100, Number(totalSupply), "Total supply should be 100");
@@ -143,12 +137,6 @@ contract("GGCToken", function(accounts) {
 
       const owner = await tokenInstance.balanceOf(OWNER);
       assert.equal(100, Number(owner.balance), "Balance should be 100");
-    });
-  });
-
-  describe("Approval tests", () => {
-    it("It should not be able to transfer tokens", async function () {
-
     });
   });
 
@@ -209,12 +197,6 @@ contract("GGCToken", function(accounts) {
     });
   });
 
-  describe.skip("Other tests", () => {
-    it("Should not allow ETH to be received", async function () {
-
-    });
-  });
-
   describe("Requiring attention", () => {
     it("Allows user to buy more than total supply", async function () {
       let owner = await tokenInstance.accInfo(OWNER);
@@ -231,7 +213,6 @@ contract("GGCToken", function(accounts) {
       const alice = await tokenInstance.accInfo(ALICE);
       assert.equal(0, Number(alice.balance), "Balance should still be 0");
     });
-
 
     it.skip("Create an overflow error on buy", async function () {
       let owner = await tokenInstance.accInfo(OWNER);
