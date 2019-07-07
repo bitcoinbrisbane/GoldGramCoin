@@ -91,6 +91,10 @@ contract GGCToken is IERC20 {
         return true;
     }
 
+    function mint(uint256 amount, bytes32 serial) public onlyOwner() {
+
+    }
+
     /**
      * Internal transfer, only can be called by this contract
      */
