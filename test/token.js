@@ -54,7 +54,7 @@ contract("GGCToken", function(accounts) {
   });
 
   //not implemented
-  describe("Balance", () => {
+  describe.only("Balance", () => {
     it("should have balance of", async function () {
       await tokenInstance.buy(100, OWNER, {from: OWNER });
       
@@ -75,37 +75,8 @@ contract("GGCToken", function(accounts) {
     });
   });
 
-  describe("Verify tests", () => {
-    it("should be verified", async function () {
-      const actual = await tokenInstance.accInfo(OWNER);
-      assert.equal(actual.isVerified, true, "Owner should be verified");
-    });
-
-    it("should not be verified", async function () {
-      const actual = await tokenInstance.accInfo(ALICE);
-      assert.equal(actual.isVerified, false, "Alice should be verified");
-    });
-
-    it("should not be verified", async function () {
-      const actual = await tokenInstance.accInfo(ALICE);
-      assert.equal(actual.isVerified, false, "Alice should be verified");
-    });
-
-    it("should allow owner to verify address", async function () {
-      await tokenInstance.verify(ALICE);
-
-      const actual = await tokenInstance.accInfo(ALICE);
-      assert.equal(actual.isVerified, true, "Alice should be verified");
-    });
-  });
-
   describe("Transfer tests", () => {
     it("should be able to transfer tokens to verfied", async function () {
-      await tokenInstance.verify(ALICE);
-      let alice = await tokenInstance.accInfo(ALICE);
-
-      assert.isTrue(alice.isVerified);
-
       await tokenInstance.buy(100, OWNER);
 
       let ownerBalance = await tokenInstance.balanceOf(OWNER);
