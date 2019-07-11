@@ -11,7 +11,7 @@ contract("Repository", function(accounts) {
     contractInstance = await Contract.new();
   });
 
-  describe("Repository tests", () => {
+  describe.only("Repository tests", () => {
     it("should add stock", async function () {
       await contractInstance.add(100, "0x01");
       const actual = await contractInstance._inventory(0);
@@ -20,6 +20,15 @@ contract("Repository", function(accounts) {
 
     it("should sum total stock", async function () {
       await contractInstance.add(200, "0x02");
+      const actual = await contractInstance.totalStock();
+      assert.equal(Number(actual), 200, "Total stock not correct");
+    });
+
+    it.skip("should stress test contract total stock", async function () {
+      for (i = 0; i < 10000; i++) {
+        await contractInstance.add(1, "0x01");
+      }
+
       const actual = await contractInstance.totalStock();
       assert.equal(Number(actual), 200, "Total stock not correct");
     });

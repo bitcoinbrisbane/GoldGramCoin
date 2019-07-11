@@ -55,7 +55,7 @@ contract("GGCToken", function(accounts) {
   });
 
   //not implemented
-  describe.only("Balance", () => {
+  describe("Balance", () => {
     beforeEach(async function () {
       await repository.add(100, OWNER, {from: OWNER });
     });
