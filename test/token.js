@@ -8,21 +8,23 @@ contract("GGCToken", function(accounts) {
   const BOB = accounts[2];
 
   let tokenInstance;
+  let repository;
 
   beforeEach(async function () {
-    let repository = await Repository.new();
+    repository = await Repository.new();
     console.log(repository.address);
 
     tokenInstance = await Token.new(repository.address);
+    await repository.updateWriter(tokenInstance.address);
   });
 
   describe("ERC20 tests", () => {
     it("should test ERC20 public properties", async function () {
       const name = await tokenInstance.name();
-      assert.equal("GGC Token", name, "Name should be GGC Token");
+      assert.equal(name, "GGC Token", "Name should be GGC Token");
 
       const symbol = await tokenInstance.symbol();
-      assert.equal("GGC", symbol, "Symbol should be GGC");
+      assert.equal(symbol, "GGC", "Symbol should be GGC");
     });
 
     it("total supply should be 0", async function () {
@@ -53,59 +55,38 @@ contract("GGCToken", function(accounts) {
     });
   });
 
-  //not implemented
-  describe("Balance", () => {
-    it("should have balance of", async function () {
-      await tokenInstance.buy(100, OWNER, {from: OWNER });
-      
+  describe.only("Mint and burn", () => {
+    beforeEach(async function () {
+      await tokenInstance.mint(100, OWNER, {from: OWNER });
+    });
+
+    it("should mint 100 tokens", async function () {
+      await tokenInstance.mint(100, OWNER, {from: OWNER });
+
       const totalSupply = await tokenInstance.totalSupply();
-      assert.equal(100, Number(totalSupply), "Total supply should be 100");
+      assert.equal(Number(totalSupply), 200, "Total supply should be 200");
 
-      await tokenInstance.transfer(ALICE, 50);
-      const aliceBalance = await tokenInstance.balanceOf(ALICE);
-      assert.equal(50, Number(aliceBalance), "Balance should be 50");
-
-      const ownerBalance = await tokenInstance.balanceOf(OWNER);
-      assert.equal(50, Number(ownerBalance), "Balance should be 50");
-
-      await tokenInstance.transferFrom(ALICE, BOB, 25, { from: BOB });
-      const bobBalance = await tokenInstance.balanceOf(BOB);
-
-      assert.equal(0, Number(bobBalance), "Balance should still be zero");
-    });
-  });
-
-  describe("Verify tests", () => {
-    it("should be verified", async function () {
-      const actual = await tokenInstance.accInfo(OWNER);
-      assert.equal(actual.isVerified, true, "Owner should be verified");
+      const balance = await tokenInstance.balanceOf(OWNER);
+      assert.equal(Number(balance), 200, "Balance should be 200");
     });
 
-    it("should not be verified", async function () {
-      const actual = await tokenInstance.accInfo(ALICE);
-      assert.equal(actual.isVerified, false, "Alice should be verified");
-    });
+    it("should burn 100 tokens", async function () {
+      await tokenInstance.burn(100, OWNER, 0);
 
-    it("should not be verified", async function () {
-      const actual = await tokenInstance.accInfo(ALICE);
-      assert.equal(actual.isVerified, false, "Alice should be verified");
-    });
+      const totalSupply = await tokenInstance.totalSupply();
+      assert.equal(Number(totalSupply), 0, "Total supply should be 0");
 
-    it("should allow owner to verify address", async function () {
-      await tokenInstance.verify(ALICE);
-
-      const actual = await tokenInstance.accInfo(ALICE);
-      assert.equal(actual.isVerified, true, "Alice should be verified");
+      const balance = await tokenInstance.balanceOf(OWNER);
+      assert.equal(Number(balance), 0, "Balance should be 0");
     });
   });
 
   describe("Transfer tests", () => {
+    beforeEach(async function () {
+      await tokenInstance.mint(100, OWNER, {from: OWNER });
+    });
+
     it("should be able to transfer tokens to verfied", async function () {
-      await tokenInstance.verify(ALICE);
-      let alice = await tokenInstance.accInfo(ALICE);
-
-      assert.isTrue(alice.isVerified);
-
       await tokenInstance.buy(100, OWNER);
 
       let ownerBalance = await tokenInstance.balanceOf(OWNER);
