@@ -56,21 +56,35 @@ contract("GGCToken", function(accounts) {
   });
 
   describe.only("Mint and burn", () => {
+    beforeEach(async function () {
+      await tokenInstance.mint(100, OWNER, {from: OWNER });
+    });
+
     it("should mint 100 tokens", async function () {
       await tokenInstance.mint(100, OWNER, {from: OWNER });
 
       const totalSupply = await tokenInstance.totalSupply();
-      assert.equal(Number(totalSupply), 100, "Total supply should be 100");
+      assert.equal(Number(totalSupply), 200, "Total supply should be 200");
 
       const balance = await tokenInstance.balanceOf(OWNER);
-      assert.equal(Number(balance), 100, "Balance should be 100");
+      assert.equal(Number(balance), 200, "Balance should be 200");
+    });
+
+    it("should burn 100 tokens", async function () {
+      await tokenInstance.burn(100, OWNER, 0);
+
+      const totalSupply = await tokenInstance.totalSupply();
+      assert.equal(Number(totalSupply), 0, "Total supply should be 0");
+
+      const balance = await tokenInstance.balanceOf(OWNER);
+      assert.equal(Number(balance), 0, "Balance should be 0");
     });
   });
 
   describe("Transfer tests", () => {
-    // beforeEach(async function () {
-    //   await tokenInstance.mint(100, OWNER, {from: OWNER });
-    // });
+    beforeEach(async function () {
+      await tokenInstance.mint(100, OWNER, {from: OWNER });
+    });
 
     it("should be able to transfer tokens to verfied", async function () {
       await tokenInstance.buy(100, OWNER);
