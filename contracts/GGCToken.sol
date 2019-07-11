@@ -91,8 +91,21 @@ contract GGCToken is IERC20 {
         return true;
     }
 
-    function mint(uint256 amount, bytes32 serial) public onlyOwner() {
+    function burn(uint256 amount, address from, uint256 index) public onlyOwner() {
+        require(from != address(0), "Invalid address");
+        Repository repo = Repository(_repository);
+        repo.remove(index);
 
+        balances[from] = balances[from].sub(amount);
+    }
+
+    function mint(uint256 amount, bytes32 serial) public onlyOwner() {
+        Repository repo = Repository(_repository);
+        repo.add(amount, serial);
+
+        balances[_owner] = balances[_owner].add(amount);
+
+        emit Transfer(address(0), _owner, amount); 
     }
 
     /**

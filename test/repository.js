@@ -11,7 +11,7 @@ contract("Repository", function(accounts) {
     contractInstance = await Contract.new();
   });
 
-  describe.only("Repository tests", () => {
+  describe("Repository tests", () => {
     it("should add stock", async function () {
       await contractInstance.add(100, "0x01");
       const actual = await contractInstance._inventory(0);
@@ -30,7 +30,7 @@ contract("Repository", function(accounts) {
       }
 
       const actual = await contractInstance.totalStock();
-      assert.equal(Number(actual), 200, "Total stock not correct");
+      assert.equal(Number(actual), 10000, "Total stock not correct");
     });
   });
 });

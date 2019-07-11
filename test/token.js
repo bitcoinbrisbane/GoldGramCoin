@@ -15,15 +15,16 @@ contract("GGCToken", function(accounts) {
     console.log(repository.address);
 
     tokenInstance = await Token.new(repository.address);
+    await repository.updateWriter(tokenInstance.address);
   });
 
   describe("ERC20 tests", () => {
     it("should test ERC20 public properties", async function () {
       const name = await tokenInstance.name();
-      assert.equal("GGC Token", name, "Name should be GGC Token");
+      assert.equal(name, "GGC Token", "Name should be GGC Token");
 
       const symbol = await tokenInstance.symbol();
-      assert.equal("GGC", symbol, "Symbol should be GGC");
+      assert.equal(symbol, "GGC", "Symbol should be GGC");
     });
 
     it("total supply should be 0", async function () {
@@ -54,32 +55,23 @@ contract("GGCToken", function(accounts) {
     });
   });
 
-  //not implemented
-  describe("Balance", () => {
-    beforeEach(async function () {
-      await repository.add(100, OWNER, {from: OWNER });
-    });
+  describe.only("Mint and burn", () => {
+    it("should mint 100 tokens", async function () {
+      await tokenInstance.mint(100, OWNER, {from: OWNER });
 
-    it("should have balance of", async function () {
-      
       const totalSupply = await tokenInstance.totalSupply();
-      assert.equal(100, Number(totalSupply), "Total supply should be 100");
+      assert.equal(Number(totalSupply), 100, "Total supply should be 100");
 
-      await tokenInstance.transferFrom(OWNER, ALICE, 50);
-      // const aliceBalance = await tokenInstance.balanceOf(ALICE);
-      // assert.equal(50, Number(aliceBalance), "Balance should be 50");
-
-      // const ownerBalance = await tokenInstance.balanceOf(OWNER);
-      // assert.equal(50, Number(ownerBalance), "Balance should be 50");
-
-      // await tokenInstance.transferFrom(ALICE, BOB, 25, { from: BOB });
-      // const bobBalance = await tokenInstance.balanceOf(BOB);
-
-      // assert.equal(0, Number(bobBalance), "Balance should still be zero");
+      const balance = await tokenInstance.balanceOf(OWNER);
+      assert.equal(Number(balance), 100, "Balance should be 100");
     });
   });
 
   describe("Transfer tests", () => {
+    // beforeEach(async function () {
+    //   await tokenInstance.mint(100, OWNER, {from: OWNER });
+    // });
+
     it("should be able to transfer tokens to verfied", async function () {
       await tokenInstance.buy(100, OWNER);
 
